@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+        <link href="styles.css" rel="stylesheet">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>To-Do List</title>
+    </head>
+
+    <body>
+        <nav class="bg-light border navbar navbar-expand-md navbar-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/"><span class="blue">T</span><span class="red">O</span><span class="yellow">D</span><span class="green">O</span> <span class="red">List Manager</span></a>
+                <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbar">
+                    <ul class="navbar-nav ms-auto mt-2">
+                        <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <h1 class="text-center">To-Do List</h1>
+        <form id="taskForm" class="text-center" action="/add_task" method="POST">
+            <input type="hidden" id="taskId" name="task_id">
+            <input type="text" id="taskInput" name="task" placeholder="Add new task...">
+            <input type="date" id="dateInput" name="date">
+            <input type="time" id="timeInput" name="time">
+            <button type="submit" id="submitButton" class="btn btn-primary">Add</button>
+        </form>
+
+        <main class="container py-5">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-start">Task</th>
+                        <th class="text-end">Date</th>
+                        <th class="text-end">Time</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="taskList">
+                    {% for task in tasks %}
+                        <tr>
+                            <td class="text-start">{{ task.task }}</td>
+                            <td class="text-end">{{ task.date }}</td>
+                            <td class="text-end">{{ task.time }}</td>
+                            <td class="text-end">
+                                <button class="btn btn-danger" onclick="deleteTask('{{ task.id }}')">Delete</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </main>
+
+        <script>
+            function deleteTask(taskId) {
+                if (confirm("Are you sure you want to delete this task?")) {
+                    fetch('/delete_task/' + taskId, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            _method: 'DELETE'
+                        })
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                location.reload(); // Reload the page after successful deletion
+                            } else {
+                                alert('Failed to delete task');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while trying to delete the task');
+                        });
+                }
+            }
+
+            // Reset form and button to default state
+            function cancelEdit() {
+                document.getElementById('taskId').value = '';
+                document.getElementById('taskInput').value = '';
+                document.getElementById('dateInput').value = '';
+                document.getElementById('timeInput').value = '';
+                document.getElementById('submitButton').innerText = 'Add';
+                document.getElementById('taskForm').action = '/add_task';
+            }
+
+            document.getElementById('cancelButton').addEventListener('click', cancelEdit);
+        </script>
+    </body>
+
+</html>
