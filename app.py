@@ -44,4 +44,6 @@ class Task(db.Model):
     priority = db.Column(db.String(10), nullable=False, default='medium')
     category = db.Column(db.String(50), nullable=False, default='General')
     status = db.Column(db.String(20), nullable=False, default='Not Started')
-    user_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+
