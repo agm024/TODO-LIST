@@ -19,7 +19,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Configuration
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_default_secret_key')
+app.config['SECRET_KEY'] = os.urandom(24) 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER') 
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
