@@ -29,3 +29,5 @@ login_manager.login_view = 'login'
 mail = Mail(app)
 migrate = Migrate(app, db)
 
+class User(db.Model)
+    id = db.Column(db.Integer, primary_key=True)
