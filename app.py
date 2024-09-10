@@ -104,4 +104,9 @@ def logout():
     flash('You are Logged Out!', 'success')
     return redirect(url_for('login'))
 
-@app.route()
+@app.route('/add_task', methods=['GET','POST'])
+@login_required
+def add_task():
+    form = TaskForm()
+    if form.validate_on_submit():
+        task = Task(title=form.title.data, description=form.description.data, due_date=form.due_date
