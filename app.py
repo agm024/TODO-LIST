@@ -63,7 +63,7 @@ class TaskForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     description = StringField('Description', validators=[DataRequired()])
     due_date = StringField('Due Date', validators=[DataRequired()])
-    priority = SelectField('Priority', choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')]
+    priority = SelectField('Priority', choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')])
     category = StringField('Category')
     submit = SubmitField('Add Task')
 
@@ -71,3 +71,5 @@ class TaskForm(FlaskForm):
 @app.route('/')
 @login_required
 def index():
+    tasks = Task.query.filter_by(user_id=current_user.id).all()
+    return render_template('index.html')
