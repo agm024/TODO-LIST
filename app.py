@@ -112,3 +112,8 @@ def add_task():
         task = Task(title=form.title.data, description=form.description.data, 
                     due_date=form.due_date.data, priority=form.priority.data,
                     category=form.category.data, user_id=current_user.id)
+        db.session.add(Task)
+        db.session.commit()
+        flash('Your Tasks Has Been Added!', 'success')
+        return redirect(url_for('index'))
+    return render_template('add_task.html', form=form)
