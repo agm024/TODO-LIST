@@ -18,3 +18,65 @@ nav a:hover {
 main {
     padding: 20px;
 }
+
+form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1em;
+    border-radius: 8px;
+    background: #f9f9f9;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for form headings */
+form h1 {
+    font-size: 24px;
+    margin-bottom: 1em;
+    color: #333;
+    text-align: center;
+}
+
+/* Style for labels */
+form label {
+    display: block;
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Style for input fields */
+form input[type="text"],
+form input[type="date"],
+form textarea,
+form select {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.5em;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 1em;
+}
+
+/* Style for submit button */
+form button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75em 1.5em;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect for submit button */
+form button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Style for required fields */
+form .required {
+    color: red;
+    font-size: 0.9em;
+    margin-left: 0.5em;
+}
