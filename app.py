@@ -9,6 +9,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, DateField, SelectField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo
 from dotenv import load_dotenv
+from flask_migrate import Migrate
 import os
 
 # Load environment variables from .env file
@@ -19,27 +20,28 @@ app = Flask(__name__)
 
 # Configuration
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_default_secret_key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///site.db')
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.example.com')  # Update mail server
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER') 
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'
-app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'false').lower() == 'true'
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS').lower() == 'true'
+app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL').lower() == 'true'
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 mail = Mail(app)
 
 # Define models
-class User(db.Model, UserMixin):
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
+    username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(200), nullable=False)
     tasks = db.relationship('Task', backref='author', lazy=True)
 
 class Task(db.Model):
