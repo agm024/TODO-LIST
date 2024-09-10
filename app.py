@@ -82,4 +82,5 @@ def register():
         user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(user)
         db.session.commit()
-        
+        flash('Your Account Has Been Created!','success')
+        return redirect(url_for('logi'))
