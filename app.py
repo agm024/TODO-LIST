@@ -229,9 +229,29 @@ def toggle_subtask(subtask_id):
 def task_dashboard():
     total_tasks = Task.query.filter_by(user_id=current_user.id).count()
     completed_tasks = Task.query.filter_by(user_id=current_user.id, status='Completed').count()
-    overdue_tasks = Task.query.filter(Task.due_date < datetime.utcnow(), Task.status != 'Completed').count()
-    return render_template('task_dashboard.html', total_tasks=total_tasks, completed_tasks=completed_tasks, overdue_tasks=overdue_tasks)
+    # Add more stats as needed
+    return render_template('task_dashboard.html', total_tasks=total_tasks, completed_tasks=completed_tasks)
+
+@app.route('/send_email/<int:task_id>')
+@login_required
+def send_email(task_id):
+    task = Task.query.get_or_404(task_id)
+    if task.author != current_user:
+        abort(403)
+    msg = Message('Task Reminder', sender=os.getenv('MAIL_USERNAME'), recipients=[current_user.email])
+    msg.body = f'Reminder for task: {task.title}\nDue Date: {task.due_date}'
+    mail.send(msg)
+    flash('Reminder email sent', 'info')
+    return redirect(url_for('index'))
+
+# Error handling
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
 
 if __name__ == '__main__':
     app.run(debug=True)
-
