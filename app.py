@@ -18,11 +18,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['MAIL_SERVER'] = 'smtp.example.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USERNAME'] = 'email.com'
-app.config['MAIL_PASSWORD'] = 'YOUR'
+app.config['MAIL_PASSWORD'] = 'YOUR_PASSWORD'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
 db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-bcrypt = Bcrypt(app)
+mail = Mail(app)
+migrate = Migrate(app, db)
