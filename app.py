@@ -42,5 +42,6 @@ class Task(db.Model):
     description = db.Column(db.String(100), nullable=False)
     due_date = db.Column(db.DateTime, nullable=False)
     priority = db.Column(db.String(10), nullable=False, default='medium')
-    category = db.Column(db.String(10), nullable=False, default='general')
-    status = db.Column(db.String(50))
+    category = db.Column(db.String(50), nullable=False, default='General')
+    status = db.Column(db.String(20), nullable=False, default='Not Started')
+    user_id = db.Column(db.Integer)
