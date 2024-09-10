@@ -109,4 +109,6 @@ def logout():
 def add_task():
     form = TaskForm()
     if form.validate_on_submit():
-        task = Task(title=form.title.data, description=form.description.data, due_date=form.due_date
+        task = Task(title=form.title.data, description=form.description.data, 
+                    due_date=form.due_date.data, priority=form.priority.data,
+                    category=form.category.data, user_id=current_user.id)
