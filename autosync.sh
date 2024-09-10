@@ -5,5 +5,5 @@ while true; do
   git commit -m "Auto Commit"
   git pull origin main --rebase
   git push origin main
-  sleep 60
+  sleep 
 done

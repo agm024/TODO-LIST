@@ -41,4 +41,5 @@ class Task(db.Model):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(100), nullable=False)
     due_date = db.Column(db.DateTime, nullable=False)
-    proi
+    priority = db.Column(db.String(10), nullable=False, default='medium')
+    category = db.Column
