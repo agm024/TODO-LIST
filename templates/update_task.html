@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Update Task</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.title.label }} {{ form.title() }}
+        {{ form.description.label }} {{ form.description() }}
+        {{ form.due_date.label }} {{ form.due_date() }}
+        {{ form.priority.label }} {{ form.priority() }}
+        {{ form.category.label }} {{ form.category() }}
+        {{ form.status.label }} {{ form.status() }}
+        {{ form.submit() }}
+    </form>
+{% endblock %}
