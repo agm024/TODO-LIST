@@ -8,10 +8,25 @@ from flask_mail import Mail, Message
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, DateField, SelectField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo
+from dotenv import load_dotenv
 import os
 
+# Load environment variables from .env file
+load_dotenv()
+
+# Flask app setup
 app = Flask(__name__)
-app.config
+
+# Configuration
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_default_secret_key')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///site.db')
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.example.com')  # Update mail server
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'
+app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'false').lower() == 'true'
+
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
@@ -19,16 +34,7 @@ login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 mail = Mail(app)
 
-class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
-    MAIL_SERVER = 'stmp.example.com'
-    MAIL_PORT = 587
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_USE_TLS = True
-    MAIL_USE_SSL = False
-
+# Define models
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
@@ -54,6 +60,7 @@ class Subtask(db.Model):
     is_completed = db.Column(db.Boolean, default=False)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
 
+# Define forms
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -74,11 +81,11 @@ class TaskForm(FlaskForm):
     status = SelectField('Status', choices=[('In Progress', 'In Progress'), ('Completed', 'Completed')])
     submit = SubmitField('Submit')
 
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Routes
 @app.route('/')
 @login_required
 def index():
@@ -90,14 +97,14 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        new_user = User(username=form.username.data, password=hashed_password)
+        new_user = User(username=form.username.data, email=form.username.data, password=hashed_password)
         try:
             db.session.add(new_user)
             db.session.commit()
             flash('Account created successfully', 'success')
             return redirect(url_for('login'))
         except IntegrityError:
-            flash('Username already exists', 'danger')
+            flash('Username or Email already exists', 'danger')
             db.session.rollback()
     return render_template('register.html', form=form)
 
