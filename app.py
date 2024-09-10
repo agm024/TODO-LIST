@@ -35,12 +35,14 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(100), nullable=False, unique=True)
+    password = db.Column(db.String(100), nullable=False)
+    tasks = db.relationship('Task', backref='owner', lazy=True)
+
     def set_password(self, password):
-        self.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def check_password(self, password):
-        return bcrypt.checkpw(password.encode('utf-8'), self.password)
-    tasks = db.relationship('Task', backref='owner', lazy=True)
+        return bcrypt.check_password_hash(self.password, password)
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -137,8 +139,7 @@ def add_task():
 @app.route('/send_email')
 @login_required
 def send_email():
-    msg = Message('Task Reminder', 
-                  recipients=[current_user.email])
+    msg = Message('Task Reminder', recipients=[current_user.email])
     msg.body = 'Don\'t forget to complete your tasks!'
     mail.send(msg)
     flash('Email sent successfully!', 'success')

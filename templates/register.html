@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>Register</h1>
-<form method="post" action="{{ url_for('register') }}">
+<form method="POST" action="{{ url_for('register') }}">
     {{ form.hidden_tag() }}
     <div>
         {{ form.username.label }}<br>
@@ -23,16 +23,10 @@
     <div>
         {{ form.password.label }}<br>
         {{ form.password(size=32) }}<br>
-        {% for error in form.password.errors %}
-        <span class="error">[{{ error }}]</span>
-        {% endfor %}
     </div>
     <div>
         {{ form.confirm_password.label }}<br>
         {{ form.confirm_password(size=32) }}<br>
-        {% for error in form.confirm_password.errors %}
-        <span class="error">[{{ error }}]</span>
-        {% endfor %}
     </div>
     <div>
         {{ form.submit() }}

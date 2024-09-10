@@ -3,7 +3,8 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<form action="{{ url_for('login')}}" method="post">
+<h1>Login</h1>
+<form method="POST" action="{{ url_for('login') }}">
     {{ form.hidden_tag() }}
     <div>
         {{ form.email.label }}<br>
@@ -15,15 +16,10 @@
     <div>
         {{ form.password.label }}<br>
         {{ form.password(size=32) }}<br>
-        {% for error in form.password.errors %}
-        <span class="error">[{{ error }}]</span>
-        {% endfor %}
     </div>
     <div>
-        {{ form.remember() }} {{form.remember.label }}
-    </div>
-    <div>
+        {{ form.remember() }} {{ form.remember.label }}<br>
         {{ form.submit() }}
-        </div>
-    </form>
-    {% endblock %}
+    </div>
+</form>
+{% endblock %}
