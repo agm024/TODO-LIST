@@ -1,2 +1,31 @@
 {% extends "base.html" %}
+
+{% block title %}Add Task{% endblock %}
+<h1>Add Task</h1>
+<form action="{{ url_for('add_task') }}" method="post">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.title.label }}<br>
+        {{ form.title(size=32) }}<br>
+        {% for error in form.title.errors %}
+        <span class="error">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.description.label }}<br>
+        {{ form.description(size=32) }}<br>
+    </div>
+    <div>
+        {{ form.priority.label }}<br>
+        {{ form.priority() }}<br>
+    </div>
+    <div>
+        {{ form.due_date.label }}<br>
+        {{ form.due_date() }}<br>
+        </div>
+        <div>
+            {{ form.category.label }}<br>
+            {{ form.category(size=32) }}<br>
+        </div>
+</form>
 {% endblock %}
