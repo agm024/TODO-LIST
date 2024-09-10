@@ -8,5 +8,22 @@
     <div>
         {{ form.email.label }}<br>
         {{ form.email(size=32) }}<br>
+        {% for error in form.email.errors %}
+        <span class="error">[{{ error }}]</span>
+        {% endfor %}
     </div>
-</form>
+    <div>
+        {{ form.password.label }}<br>
+        {{ form.password(size=32) }}<br>
+        {% for error in form.password.errors %}
+        <span class="error">[{{ error }}]</span>
+        {% endfor %}
+    </div>
+    <div>
+        {{ form.remember() }} {{form.remember.label }}
+    </div>
+    <div>
+        {{ form.submit() }}
+        </div>
+    </form>
+    {% endblock %}
