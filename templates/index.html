@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Your To-Do List</h1>
+<ul>
+    {% for task in tasks %}
+        <li>
+            <h2>{{ task.title }}</h2>
+            <p>{{ task.description }}</p>
+            <p>Due Date: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No Due Date' }}</p>
+            <p>Priority: {{ task.priority }}</p>
+            <p>Category: {{ task.category }}</p>
+            <p>Status: {{ task.status }}</p>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

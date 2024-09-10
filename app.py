@@ -30,7 +30,7 @@ login_manager.login_view = 'login'
 mail = Mail(app)
 migrate = Migrate(app, db)
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(100), nullable=False, unique=True)
@@ -67,6 +67,10 @@ class TaskForm(FlaskForm):
     priority = SelectField('Priority', choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')])
     category = StringField('Category')
     submit = SubmitField('Add Task')
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # Routes
 @app.route('/')
