@@ -64,5 +64,10 @@ class TaskForm(FlaskForm):
     description = StringField('Description', validators=[DataRequired()])
     due_date = StringField('Due Date', validators=[DataRequired()])
     priority = SelectField('Priority', choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')]
-    category = SelectField('Category', choices=['General', 'Work', 'Personal'])
+    category = StringField('Category')
     submit = SubmitField('Add Task')
+
+# Routes
+@app.route('/')
+@login_required
+def index():
