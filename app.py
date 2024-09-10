@@ -46,4 +46,13 @@ class Task(db.Model):
     status = db.Column(db.String(20), nullable=False, default='Not Started')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-class 
+class Registeration(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Sign Up')
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    
