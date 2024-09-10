@@ -17,8 +17,8 @@ app.config['SECRET_KEY'] = os.urandom(24).hex()
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 app.config['MAIL_SERVER'] = 'smtp.example.com'
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'email.com'
-app.config['MAIL_PASSWORD'] = 'YOUR_PASSWORD'
+app.config['MAIL_USERNAME'] = 'stemavericks.teams@hotmail.com'
+app.config['MAIL_PASSWORD'] = 'Stemavericks@2024'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_DEFAULT_SENDER'] = 'stemavericks.teams@hotmail.com'
@@ -118,3 +118,15 @@ def add_task():
         flash('Your Tasks Has Been Added!', 'success')
         return redirect(url_for('index'))
     return render_template('add_task.html', form=form)
+
+@app.route('/send_email')
+@login_required
+def send_email():
+    msg = Message('Task Reminder', 
+                  recipients=[current_user.email])  # You can specify recipients here
+    msg.body = 'Don\'t forget to complete your tasks!'
+    mail.send(msg)
+    flash('Email sent successfully!', 'success')
+    return redirect(url_for('index'))
+
+if __name__ == 'main'
