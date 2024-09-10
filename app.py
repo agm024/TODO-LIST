@@ -63,4 +63,6 @@ class TaskForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     description = StringField('Description', validators=[DataRequired()])
     due_date = StringField('Due Date', validators=[DataRequired()])
-    
+    priority = SelectField('Priority', choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')]
+    category = SelectField('Category', choices=['General', 'Work', 'Personal'])
+    submit = SubmitField('Add Task')
