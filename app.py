@@ -1,14 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, logout_user, login_required, login_remembered, current_user, UserMixin
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from flask_bcrypt import Bcrypt
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, DateField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from flask_mail import Mail, Message
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 load_dotenv()
 
@@ -35,7 +36,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
-    tasks = db.Column(db.String(60), nullable=False)
+    tasks = db.relationship('Task', backref='owner', lazy=True)
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,23 +73,23 @@ class TaskForm(FlaskForm):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Routes
 @app.route('/')
 @login_required
 def index():
     tasks = Task.query.filter_by(user_id=current_user.id).all()
     return render_template('index.html', tasks=tasks)
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route("/register", methods=['GET', 'POST'])
 def register():
-    form = Registeration()
+    form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(user)
         db.session.commit()
-        flash('Your Account Has Been Created!','success')
-        return redirect(url_for('login'))
+        login_user(user)
+        flash('Your account has been created!', 'success')
+        return redirect(url_for('index'))
     return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -109,17 +110,23 @@ def logout():
     flash('You are Logged Out!', 'success')
     return redirect(url_for('login'))
 
-@app.route('/add_task', methods=['GET','POST'])
+@app.route('/add_task', methods=['GET', 'POST'])
 @login_required
 def add_task():
     form = TaskForm()
     if form.validate_on_submit():
+        try:
+            due_date = datetime.strptime(form.due_date.data, '%Y-%m-%d')
+        except ValueError:
+            flash('Invalid date format. Please use YYYY-MM-DD.', 'danger')
+            return redirect(url_for('add_task'))
+
         task = Task(title=form.title.data, description=form.description.data, 
-                    due_date=form.due_date.data, priority=form.priority.data,
+                    due_date=due_date, priority=form.priority.data,
                     category=form.category.data, user_id=current_user.id)
-        db.session.add(Task)
+        db.session.add(task)
         db.session.commit()
-        flash('Your Tasks Has Been Added!', 'success')
+        flash('Your Task Has Been Added!', 'success')
         return redirect(url_for('index'))
     return render_template('add_task.html', form=form)
 
@@ -127,7 +134,7 @@ def add_task():
 @login_required
 def send_email():
     msg = Message('Task Reminder', 
-                  recipients=[current_user.email])  # You can specify recipients here
+                  recipients=[current_user.email])
     msg.body = 'Don\'t forget to complete your tasks!'
     mail.send(msg)
     flash('Email sent successfully!', 'success')
