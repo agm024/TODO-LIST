@@ -1,0 +1,167 @@
+from flask import Flask, render_template, request, redirect, url_for, flash, session, abort
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user, UserMixin
+from datetime import datetime
+from sqlalchemy.exc import IntegrityError
+from flask_mail import Mail, Message
+from config import Config
+from models import User, Task, Subtask
+from forms import RegistrationForm, LoginForm, TaskForm
+
+app = Flask(__name__)
+app.config.from_object(Config)
+db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
+mail = Mail(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+@app.route('/')
+@login_required
+def index():
+    tasks = Task.query.filter_by(user_id=current_user.id, archived=False).all()
+    return render_template('index.html', tasks=tasks)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        new_user = User(username=form.username.data, password=hashed_password)
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Account created successfully', 'success')
+            return redirect(url_for('login'))
+        except IntegrityError:
+            flash('Username already exists', 'danger')
+            db.session.rollback()
+    return render_template('register.html', form=form)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user)
+            flash('Login successful', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Login failed. Check username and/or password', 'danger')
+    return render_template('login.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out', 'info')
+    return redirect(url_for('login'))
+
+@app.route('/add_task', methods=['GET', 'POST'])
+@login_required
+def add_task():
+    form = TaskForm()
+    if form.validate_on_submit():
+        new_task = Task(
+            title=form.title.data,
+            description=form.description.data,
+            due_date=form.due_date.data,
+            priority=form.priority.data,
+            category=form.category.data,
+            status=form.status.data,
+            author=current_user
+        )
+        db.session.add(new_task)
+        db.session.commit()
+        flash('Task added', 'success')
+        return redirect(url_for('index'))
+    return render_template('add_task.html', form=form)
+
+@app.route('/update_task/<int:task_id>', methods=['GET', 'POST'])
+@login_required
+def update_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    if task.author != current_user:
+        abort(403)
+    form = TaskForm(obj=task)
+    if form.validate_on_submit():
+        task.title = form.title.data
+        task.description = form.description.data
+        task.due_date = form.due_date.data
+        task.priority = form.priority.data
+        task.category = form.category.data
+        task.status = form.status.data
+        db.session.commit()
+        flash('Task updated', 'success')
+        return redirect(url_for('index'))
+    return render_template('update_task.html', form=form, task=task)
+
+@app.route('/delete_task/<int:task_id>')
+@login_required
+def delete_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    if task.author != current_user:
+        abort(403)
+    db.session.delete(task)
+    db.session.commit()
+    flash('Task deleted', 'success')
+    return redirect(url_for('index'))
+
+@app.route('/archive_task/<int:task_id>')
+@login_required
+def archive_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    if task.author != current_user:
+        abort(403)
+    task.archived = True
+    db.session.commit()
+    flash('Task archived', 'success')
+    return redirect(url_for('index'))
+
+@app.route('/archived_tasks')
+@login_required
+def archived_tasks():
+    tasks = Task.query.filter_by(user_id=current_user.id, archived=True).all()
+    return render_template('archived_tasks.html', tasks=tasks)
+
+@app.route('/add_subtask/<int:task_id>', methods=['POST'])
+@login_required
+def add_subtask(task_id):
+    task = Task.query.get_or_404(task_id)
+    if task.author != current_user:
+        abort(403)
+    title = request.form.get('title')
+    new_subtask = Subtask(title=title, parent_task=task)
+    db.session.add(new_subtask)
+    db.session.commit()
+    flash('Subtask added', 'success')
+    return redirect(url_for('update_task', task_id=task_id))
+
+@app.route('/toggle_subtask/<int:subtask_id>')
+@login_required
+def toggle_subtask(subtask_id):
+    subtask = Subtask.query.get_or_404(subtask_id)
+    if subtask.parent_task.author != current_user:
+        abort(403)
+    subtask.is_completed = not subtask.is_completed
+    db.session.commit()
+    flash('Subtask updated', 'success')
+    return redirect(url_for('update_task', task_id=subtask.parent_task.id))
+
+@app.route('/task_dashboard')
+@login_required
+def task_dashboard():
+    total_tasks = Task.query.filter_by(user_id=current_user.id).count()
+    completed_tasks = Task.query.filter_by(user_id=current_user.id, status='Completed').count()
+    overdue_tasks = Task.query.filter(Task.due_date < datetime.utcnow(), Task.status != 'Completed').count()
+    return render_template('task_dashboard.html', total_tasks=total_tasks, completed_tasks=completed_tasks, overdue_tasks=overdue_tasks)
+
+if __name__ == '__main__':
+    app.run(debug=True)
