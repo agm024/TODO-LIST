@@ -18,8 +18,8 @@ load_dotenv()
 # Flask app setup
 app = Flask(__name__)
 
-# Configuration
-app.config['SECRET_KEY'] = os.urandom(24) 
+# Configuration 
+app.config['SECRET_KEY'] = os.urandom(32).hex()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER') 
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
@@ -37,12 +37,15 @@ login_manager.login_message_category = 'info'
 mail = Mail(app)
 
 # Define models
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     tasks = db.relationship('Task', backref='author', lazy=True)
+
+    def __repr__(self):
+        return f'<User {self.username}>'
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -231,3 +234,4 @@ def task_dashboard():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
