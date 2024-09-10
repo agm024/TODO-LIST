@@ -72,4 +72,14 @@ class TaskForm(FlaskForm):
 @login_required
 def index():
     tasks = Task.query.filter_by(user_id=current_user.id).all()
-    return render_template('index.html')
+    return render_template('index.html', tasks=tasks)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = Registeration()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+        
