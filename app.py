@@ -55,4 +55,12 @@ class Registeration(FlaskForm):
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Login')
+
+class TaskForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    description = StringField('Description', validators=[DataRequired()])
+    due_date = StringField('Due Date', validators=[DataRequired()])
     
