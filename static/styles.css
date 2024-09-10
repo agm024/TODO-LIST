@@ -15,9 +15,6 @@ nav a {
 nav a:hover {
     text-decoration: underline;
 }
-main {
-    padding: 20px;
-}
 
 form {
     max-width: 600px;
@@ -80,3 +77,22 @@ form .required {
     font-size: 0.9em;
     margin-left: 0.5em;
 }
+
+.high-priority { color: red; }
+.medium-priority { color: yellow; }
+.low-priority { color: green; }
+
+:root {
+    --background-color: #fff;
+    --text-color: #000;
+  }
+  
+  .dark-mode {
+    --background-color: #333;
+    --text-color: #fff;
+  }
+  
+  body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
