@@ -21,6 +21,7 @@ app.config['MAIL_USERNAME'] = 'email.com'
 app.config['MAIL_PASSWORD'] = 'YOUR_PASSWORD'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_DEFAULT_SENDER'] = 'stemavericks.teams@hotmail.com'
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
