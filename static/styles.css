@@ -1,17 +1,22 @@
 /* Example styles */
 body {
     font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
+
 nav {
     background-color: #333;
     color: #fff;
     padding: 10px;
 }
+
 nav a {
     color: #fff;
     margin-right: 10px;
     text-decoration: none;
 }
+
 nav a:hover {
     text-decoration: underline;
 }
@@ -82,17 +87,13 @@ form .required {
 .medium-priority { color: yellow; }
 .low-priority { color: green; }
 
+/* Dark mode variables */
 :root {
     --background-color: #fff;
     --text-color: #000;
-  }
-  
-  .dark-mode {
+}
+
+.dark-mode {
     --background-color: #333;
     --text-color: #fff;
-  }
-  
-  body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-  }
+}
