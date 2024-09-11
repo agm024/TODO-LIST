@@ -21,6 +21,12 @@
             <a href="{{ url_for('login') }}">Login</a>
             <a href="{{ url_for('register') }}">Register</a>
         {% endif %}
+        <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+<script>
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+  }
+</script>
     </nav>
     <main>
         {% block content %}
