@@ -5,20 +5,33 @@ body {
     color: var(--text-color);
 }
 
+a:visited{
+    text-decoration: none;
+}
+
+a:link{
+    color: grey;
+    text-decoration: none;
+}
+a:link:hover{
+    text-decoration: underline;
+}
+
 nav {
-    background-color: #333;
-    color: #fff;
+    background-color: var(--nav-background-color);
+    color: var(--nav-text-color);
     padding: 10px;
 }
 
 nav a {
-    color: #fff;
+    color: var(--nav-text-color);
     margin-right: 10px;
     text-decoration: none;
 }
 
 nav a:hover {
     text-decoration: underline;
+    color: var(--link-hover-color);
 }
 
 form {
@@ -91,9 +104,15 @@ form .required {
 :root {
     --background-color: #fff;
     --text-color: #000;
+    --nav-background-color: #333;
+    --nav-text-color: #fff;
+    --link-hover-color: #0056b3; /* Default hover color */
 }
 
 .dark-mode {
     --background-color: #333;
     --text-color: #fff;
+    --nav-background-color: #444; /* Dark mode background color for nav */
+    --nav-text-color: #fff;
+    --link-hover-color: #bbf; /* Dark mode hover color for links */
 }
